@@ -10,19 +10,45 @@ spring:
       max-file-size: 2MB  #文件上传大小限制 设置最大值  不能超过该值 否则报错
       max-request-size: 2MB #文件最大请求限制 用于批量上传
   profiles:
-    active: dev
+    active: dev #prod
   main:
     allow-circular-references: true
   datasource:
-      driver-class-name: ${sky.datasource.driver-class-name}
-      url: jdbc:mariadb://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
-      username: ${sky.datasource.username}
-      password: ${sky.datasource.password}
+    driver-class-name: ${sky.datasource.driver-class-name}
+    url: jdbc:mariadb://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${sky.datasource.username}
+    password: ${sky.datasource.password}
+    type: com.zaxxer.hikari.HikariDataSource  #数据源的类型
+    hikari:
+      connection-timeout: 30000 #等待连接池分配连接的最大时间（毫秒）
+      minimum-idle: 5           #最小连接数
+      maximum-pool-size: 20     #最大连接数
+      auto-commit: true         #自动提交
+      idle-timeout: 600000      #连接超时的最大时长(毫秒)
+      pool-name: DataSourceHikariCP #连接池的名字
+      max-lifetime: 18000000    #连接池的最大生命时长(毫秒)
+      connection-test-query: SELECT 1
   banner:
     location: classpath:banner/banner.txt
 #  data:
 #    mongodb:
 #      uri: mongodb://localhost:27017/your_database
+
+# 整合mybatis
+mybatis:
+  type-aliases-package: com.imooc.pojo  #所有pojo类所在的包路径
+  mapper-locations: classpath:mapper/*.xml  #mapper映射文件
+
+# 通用mapper工具的配置
+mapper:
+  mappers: com.imooc.my.mapper.MyMapper #配置MyMapper 包含一些封装好的CRUD方法
+  not-empty: false  #在进行数据库操作的时候  username != null
+  identity: MariaDB
+
+# 分页插件助手的配置
+pagehelper:
+  helper-dialect: MariaDB
+  support-methods-arguments: true
 
 #logging:
 #  level:

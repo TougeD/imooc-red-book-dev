@@ -16,6 +16,7 @@
         <module>book-mapper</module>
         <module>book-service</module>
         <module>book-api</module>
+
     </modules>
 
     <properties>

@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.spring.annotation.MapperScan;
 
 /**
  * @author 小小低头哥
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootApplication(exclude = MongoAutoConfiguration.class)
 @Transactional
+@MapperScan(basePackages = "com.imooc.mapper")
 public class Application {
 
     public static void main(String[] args) {
