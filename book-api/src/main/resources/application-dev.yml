@@ -1,0 +1,8 @@
+sky:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    host: localhost
+    port: 3307
+    database: imooc-red-book-dev
+    username: root
+    password: 123456

@@ -1,0 +1,29 @@
+server:
+  port: 8099
+  tomcat:
+    uri-encoding: UTF-8
+    max-swallow-size: -1  # tomcat默认大小2M，超过2M的文件不会被捕获，需要调整此处大小为100MB或-1
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 2MB  #文件上传大小限制 设置最大值  不能超过该值 否则报错
+      max-request-size: 2MB #文件最大请求限制 用于批量上传
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+  datasource:
+      driver-class-name: ${sky.datasource.driver-class-name}
+      url: jdbc:mariadb://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${sky.datasource.username}
+      password: ${sky.datasource.password}
+  banner:
+    location: classpath:banner/banner.txt
+#  data:
+#    mongodb:
+#      uri: mongodb://localhost:27017/your_database
+
+#logging:
+#  level:
+#    root: DEBUG
