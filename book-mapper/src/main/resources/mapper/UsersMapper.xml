@@ -22,4 +22,36 @@
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
+
+  <update id="updateByUsers">
+    update users
+    <set>
+      <if test="mobile != null" > mobile = #{mobile} ,</if>
+      <if test="nickname != null" > nickname = #{nickname} ,</if>
+      <if test="imoocNum != null" > imooc_num = #{imoocNum} ,</if>
+      <if test="face != null" > face = #{face} ,</if>
+      <if test="sex != null" > sex = #{sex} ,</if>
+      <if test="birthday != null" > birthday = #{birthday} ,</if>
+      <if test="country != null" > country = #{country} ,</if>
+      <if test="province != null" > province = #{province} ,</if>
+      <if test="city != null" > city = #{city} ,</if>
+      <if test="district != null" > district = #{district} ,</if>
+      <if test="description != null" > description = #{description} ,</if>
+      <if test="bgImg != null" > bg_img = #{bgImg} ,</if>
+      <if test="canImoocNumBeUpdated != null" > can_imooc_num_be_updated = #{canImoocNumBeUpdated} ,</if>
+      <if test="createdTime != null" > created_time = #{createdTime} ,</if>
+      <if test="updatedTime != null" > updated_time = #{updatedTime} ,</if>
+    </set>
+    where id = #{id}
+  </update>
+
+  <select id="queryUserByUser" resultType="com.imooc.pojo.Users">
+        select * from users
+        <where>
+          <if test="id != null"> id = #{id} </if>
+          <if test="mobile != null"> mobile = #{mobile} </if>
+          <if test="imoocNum != null"> imooc_num = #{imoocNum} </if>
+          <if test="nickname != null"> nickname = #{nickname} </if>
+        </where>
+    </select>
 </mapper>

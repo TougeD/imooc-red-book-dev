@@ -10,6 +10,12 @@ public enum ResponseStatusEnum {
     SUCCESS(200, true, "操作成功！"),
     FAILED(500, false, "操作失败！"),
 
+
+    LOGIN_NULL_FAILED(500,false,"登录失败,请填写手机号或验证码"),
+    MOBILE_LENGTH_ERROR(500,false,"手机号长度不对劲"),
+    SMS_IS_NOT_EXIST(500,false,"验证码不存在或已过期，请先获取验证码"),
+    SMS_IS_NOT_RIGHT(500,false,"验证码不正确，请重新输入"),
+    USER_INFO_UPDATE_FAILED(500,false,"用户信息修改失败"),
     // 50x
     UN_LOGIN(501,false,"请登录后再继续操作！"),
     TICKET_INVALID(502,false,"会话失效，请重新登录！"),
