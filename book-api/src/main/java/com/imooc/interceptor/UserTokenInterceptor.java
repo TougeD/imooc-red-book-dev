@@ -1,8 +1,7 @@
 package com.imooc.interceptor;
 
-import com.imooc.controller.BaseInfoProperties;
+import com.imooc.base.BaseInfoProperties;
 import com.imooc.exceptions.GraceException;
-import com.imooc.grace.result.GraceJSONResult;
 import com.imooc.grace.result.ResponseStatusEnum;
 import com.imooc.utils.RedisOperator;
 import lombok.extern.slf4j.Slf4j;

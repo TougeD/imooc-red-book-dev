@@ -1,6 +1,6 @@
 package com.imooc.interceptor;
 
-import com.imooc.controller.BaseInfoProperties;
+import com.imooc.base.BaseInfoProperties;
 import com.imooc.exceptions.SMSSendErrorException;
 import com.imooc.grace.result.ResponseStatusEnum;
 import com.imooc.utils.IPUtil;

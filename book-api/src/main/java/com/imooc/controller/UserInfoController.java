@@ -1,6 +1,7 @@
 package com.imooc.controller;
 
-import com.imooc.VO.UsersVO;
+import com.imooc.base.BaseInfoProperties;
+import com.imooc.vo.UsersVO;
 import com.imooc.config.MinIOConfig;
 import com.imooc.dto.UpdatedUserDTO;
 import com.imooc.enums.FileTypeEnum;
@@ -11,7 +12,6 @@ import com.imooc.grace.result.ResponseStatusEnum;
 import com.imooc.pojo.Users;
 import com.imooc.service.UserService;
 import com.imooc.utils.AliOssUtil;
-import com.imooc.utils.MinIOUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ import java.util.UUID;
 @Api(tags = "用户信息接口")
 @RestController
 @RequestMapping("userInfo")
-public class UserInfoController extends BaseInfoProperties{
+public class UserInfoController extends BaseInfoProperties {
 
     @Autowired
     private UserService userService;

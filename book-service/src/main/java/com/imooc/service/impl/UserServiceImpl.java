@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
     public Users updateUserInfo(UpdatedUserDTO updatedUserDTO) {
         Users user = new Users();
         BeanUtils.copyProperties(updatedUserDTO, user);
-        user.setUpdatedTime(new Date());
+//        user.setUpdatedTime(new Date());
 //        int result = usersMapper.updateByPrimaryKeySelective(user);
 //        if (result != 1) {
 //            throw new UpdateUserErrorException(ResponseStatusEnum.USER_INFO_UPDATE_FAILED);
@@ -133,12 +133,12 @@ public class UserServiceImpl implements UserService {
                 .district("")
                 .description("这家伙真懒，啥都不写")
                 .canImoocNumBeUpdated(YesOrNo.YES.type)
-                .createdTime(new Date())
-                .updatedTime(new Date())
+//                .createdTime(new Date())
+//                .updatedTime(new Date())
                 .build();
 
-        usersMapper.insert(users);
-
+//        usersMapper.insert(users);
+        usersMapper.add(users);
         return users;
     }
 

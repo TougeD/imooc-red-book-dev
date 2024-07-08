@@ -1,9 +1,12 @@
 package com.imooc.pojo;
 
+import lombok.ToString;
+
 import javax.persistence.Column;
 import javax.persistence.Id;
 import java.util.Date;
 
+@ToString
 public class Vlog {
     @Id
     private String id;

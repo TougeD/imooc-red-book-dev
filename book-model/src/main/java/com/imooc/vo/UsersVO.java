@@ -1,4 +1,4 @@
-package com.imooc.VO;
+package com.imooc.vo;
 
 import com.imooc.pojo.Users;
 import lombok.AllArgsConstructor;

@@ -1,32 +1,28 @@
-package com.imooc.dto;
+package com.imooc.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.validation.constraints.Digits;
-import javax.validation.constraints.NotBlank;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class VlogDTO {
-
-    private String id;
-    @NotBlank
+public class IndexVlogVO {
+    private String vlogId;
     private String vlogerId;
-    @NotBlank
+    private String vlogerFace;
+    private String vlogerName;
+    private String content;
     private String url;
-    @NotBlank
     private String cover;
-    @NotBlank
-    private String title;
-    @Digits(integer = 10,fraction = 5)
     private Integer width;
-    @Digits(integer = 10,fraction = 5)
     private Integer height;
     private Integer likeCounts;
     private Integer commentsCounts;
+    private Integer isPrivate;
+    private boolean isPlay = false;
+    private boolean doIFollowVloger = false;
+    private boolean doILikeThisVlog = false;
 }

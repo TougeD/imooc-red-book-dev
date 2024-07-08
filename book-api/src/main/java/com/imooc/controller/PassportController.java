@@ -1,6 +1,7 @@
 package com.imooc.controller;
 
-import com.imooc.VO.UsersVO;
+import com.imooc.base.BaseInfoProperties;
+import com.imooc.vo.UsersVO;
 import com.imooc.dto.LoginDTO;
 import com.imooc.exceptions.LoginErrorException;
 import com.imooc.exceptions.SMSSendErrorException;

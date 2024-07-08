@@ -18,4 +18,56 @@
     <result column="created_time" property="createdTime" jdbcType="TIMESTAMP" />
     <result column="updated_time" property="updatedTime" jdbcType="TIMESTAMP" />
   </resultMap>
+    <update id="updateByVlog">
+        update vlog
+        <set>
+            <if test="url != null"> url = #{url},</if>
+            <if test="cover != null"> cover = #{cover},</if>
+            <if test="title != null"> title = #{title},</if>
+            <if test="width != null"> width = #{width},</if>
+            <if test="height != null"> height = #{height},</if>
+            <if test="likeCounts != null"> like_counts = #{likeCounts},</if>
+            <if test="commentsCounts != null"> comments_counts = #{commentsCounts},</if>
+            <if test="isPrivate != null"> is_private = #{isPrivate},</if>
+            <if test="createdTime != null"> created_time = #{createdTime},</if>
+            <if test="updatedTime != null"> updated_time = #{updatedTime},</if>
+        </set>
+        <where>
+            <if test="id!=null">and id=#{id}</if>
+            <if test="vlogerId!=null">and vloger_id=#{vlogerId}</if>
+        </where>
+    </update>
+
+    <select id="queryBatchByVlog" resultType="com.imooc.pojo.Vlog">
+        select *
+        from vlog
+        <where>
+            <if test="id!=null">and id = #{id}</if>
+            <if test="vlogerId!=null">and vloger_id = #{vlogerId}</if>
+            <if test="isPrivate != null">and is_private = #{isPrivate}</if>
+        </where>
+    </select>
+
+    <select id="queryBatch" resultType="com.imooc.vo.IndexVlogVO">
+        select
+            v.id as vlogId, v.vloger_id,u.face vlogerFace, u.nickname vlogerName,
+            v.title content,v.url,v.cover,v.width,v.height,v.like_counts,
+            v.comments_counts,v.is_private
+        from vlog v left join users u on v.vloger_id = u.id
+        where v.is_private = 0
+        <if test="search != null and search != ''">
+          and v.title like concat('%',#{search},'%')
+        </if>
+        Order By v.created_time desc
+    </select>
+
+    <select id="queryVlogDetailById" resultType="com.imooc.vo.IndexVlogVO">
+        select
+        v.id as vlogId, v.vloger_id,u.face vlogerFace, u.nickname vlogerName,
+        v.title content,v.url,v.cover,v.width,v.height,v.like_counts,
+        v.comments_counts,v.is_private
+        from vlog v left join users u on v.vloger_id = u.id
+        where v.id = #{vlogId}
+    </select>
+
 </mapper>
