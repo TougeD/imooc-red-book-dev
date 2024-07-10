@@ -16,6 +16,9 @@ public enum ResponseStatusEnum {
     SMS_IS_NOT_EXIST(500,false,"验证码不存在或已过期，请先获取验证码"),
     SMS_IS_NOT_RIGHT(500,false,"验证码不正确，请重新输入"),
     USER_INFO_UPDATE_FAILED(500,false,"用户信息修改失败"),
+    FANS_FOLLOW_SELF_ERROR(500,false,"关注异常，自己不能关注自己"),
+    FANS_FOLLOW_NOT_EXIST_ERROR(500,false,"关注异常，用户不存在"),
+
     // 50x
     UN_LOGIN(501,false,"请登录后再继续操作！"),
     TICKET_INVALID(502,false,"会话失效，请重新登录！"),

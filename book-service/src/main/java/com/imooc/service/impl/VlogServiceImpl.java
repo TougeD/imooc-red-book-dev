@@ -5,8 +5,11 @@ import com.github.pagehelper.PageHelper;
 import com.imooc.base.BaseInfoProperties;
 import com.imooc.dto.VlogDTO;
 import com.imooc.enums.YesOrNo;
+import com.imooc.mapper.MyLikedVlogMapper;
 import com.imooc.mapper.VlogMapper;
+import com.imooc.pojo.MyLikedVlog;
 import com.imooc.pojo.Vlog;
+import com.imooc.service.FansService;
 import com.imooc.service.VlogService;
 import com.imooc.utils.PagedGridResult;
 import com.imooc.vo.IndexVlogVO;
@@ -17,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +39,162 @@ public class VlogServiceImpl extends BaseInfoProperties implements VlogService {
     private VlogMapper vlogMapper;
 
     @Autowired
+    private MyLikedVlogMapper myLikedVlogMapper;
+
+    @Autowired
+    private FansService fansService;
+
+    @Autowired
     private Sid sid;
 
+    /**
+     * 查询朋友发布的短视频列表
+     * @param userId
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public PagedGridResult gerMyFriendVlogList(String userId, Integer page, Integer pageSize) {
+        PageHelper.startPage(page,pageSize);
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId",userId);
+        Page<IndexVlogVO> myFriendVlogList = vlogMapper.getMyFriendVlogList(map);
+        List<IndexVlogVO> result = myFriendVlogList.getResult();
+
+        for (IndexVlogVO v : result) {
+            String vlogerId = v.getVlogerId();
+            String vlogId = v.getVlogId();
+
+            //判断用户是否点赞过视频
+            if (StringUtils.isNotBlank(userId)) {
+                //用户必定关注该博主
+                boolean doIFollowVloger = fansService.queryDoIFollowVloger(userId, vlogerId);
+                v.setDoIFollowVloger(doIFollowVloger);
+                //判断用户是否点赞过视频
+                v.setDoILikeThisVlog(doILikeVlog(userId, vlogId));
+            }
+
+            //获取当前视频被点赞过得总数
+            v.setLikeCounts(getVlogBeLikedCounts(vlogId));
+
+        }
+
+        return setterPagedGrid(result,page);
+    }
+
+    private IndexVlogVO setterVo(IndexVlogVO v,String userId){
+        String vlogerId = v.getVlogerId();
+        String vlogId = v.getVlogId();
+
+        //判断用户是否点赞过视频
+        if (StringUtils.isNotBlank(userId)) {
+            //用户必定关注该博主
+            boolean doIFollowVloger = fansService.queryDoIFollowVloger(userId, vlogerId);
+            v.setDoIFollowVloger(doIFollowVloger);
+            //判断用户是否点赞过视频
+            v.setDoILikeThisVlog(doILikeVlog(userId, vlogId));
+        }
+
+        //获取当前视频被点赞过得总数
+        v.setLikeCounts(getVlogBeLikedCounts(vlogId));
+
+        return v;
+    }
+
+    /**
+     * 查询用户关注的博主发布的短视频列表
+     * @param userId
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public PagedGridResult gerMyFollowVlogList(String userId, Integer page, Integer pageSize) {
+        PageHelper.startPage(page,pageSize);
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId",userId);
+        Page<IndexVlogVO> myFollowVlogList = vlogMapper.getMyFollowVlogList(map);
+        List<IndexVlogVO> result = myFollowVlogList.getResult();
+
+        for (IndexVlogVO v : result) {
+            String vlogerId = v.getVlogerId();
+            String vlogId = v.getVlogId();
+
+            //判断用户是否点赞过视频
+            if (StringUtils.isNotBlank(userId)) {
+                //用户必定关注该博主
+                boolean doIFollowVloger = fansService.queryDoIFollowVloger(userId, vlogerId);
+                v.setDoIFollowVloger(doIFollowVloger);
+                //判断用户是否点赞过视频
+                v.setDoILikeThisVlog(doILikeVlog(userId, vlogId));
+            }
+
+            //获取当前视频被点赞过得总数
+            v.setLikeCounts(getVlogBeLikedCounts(vlogId));
+
+        }
+
+        return setterPagedGrid(result,page);
+
+    }
+
+    /**
+     * 查询用户点赞过的短视频
+     * @param userId
+     * @param page
+     * @param pageSize
+     * @return
+     */
+    @Override
+    public PagedGridResult gerMyLikedVlogList(String userId, Integer page, Integer pageSize) {
+        PageHelper.startPage(page,pageSize);
+        Map<String, Object> map = new HashMap<>();
+        map.put("userId",userId);
+        Page<IndexVlogVO> myLikedVlogList = vlogMapper.getMyLikedVlogList(map);
+        List<IndexVlogVO> result = myLikedVlogList.getResult();
+        return setterPagedGrid(result,page);
+    }
+
+    /**
+     * 取消点赞/喜欢的视频
+     *
+     * @param userId
+     * @param vlogId
+     */
+    @Override
+    public void userUnLikeVlog(String userId, String vlogId) {
+        MyLikedVlog myLikedVlog = MyLikedVlog.builder()
+                .userId(userId)
+                .vlogId(vlogId)
+                .build();
+
+        myLikedVlogMapper.deleteByMyLikedVlog(myLikedVlog);
+    }
+
+    /**
+     * 用户喜欢/喜欢的视频
+     *
+     * @param userId
+     * @param vlogId
+     */
+    @Transactional
+    @Override
+    public void userLikeVlog(String userId, String vlogId) {
+        String rid = sid.nextShort();
+
+        MyLikedVlog myLikedVlog = MyLikedVlog.builder()
+                .userId(userId)
+                .id(rid)
+                .vlogId(vlogId)
+                .build();
+
+        myLikedVlogMapper.add(myLikedVlog);
+    }
 
     /**
      * 改变用户视频可见状态
+     *
      * @param userId
      * @param vlogId
      * @param yesOrNo
@@ -55,45 +210,82 @@ public class VlogServiceImpl extends BaseInfoProperties implements VlogService {
     }
 
     @Override
-    public IndexVlogVO queryVlogDetailById(String vlogId) {
-        Map<String,Object> map = new HashMap<>();
-        if(StringUtils.isNotBlank(vlogId)){
-            map.put("vlogId",vlogId);
+    public IndexVlogVO queryVlogDetailById(String userId,String vlogId) {
+        Map<String, Object> map = new HashMap<>();
+        if (StringUtils.isNotBlank(vlogId)) {
+            map.put("vlogId", vlogId);
         }
         List<IndexVlogVO> result = vlogMapper.queryVlogDetailById(map);
-        if(result != null && result.size() >0 ){
-            return result.get(0);
+        if (result != null && result.size() > 0) {
+            IndexVlogVO indexVlogVO = result.get(0);
+
+            return setterVo(indexVlogVO,userId);
         }
         return null;
     }
 
     /**
      * 查询首页/搜索的vlog列表
+     *
      * @param search
      * @return
      */
     @Override
-    public PagedGridResult getIndexVlogList(String search, Integer page, Integer pageSize) {
-        Map<String,Object> map = new HashMap<>();
-        if(StringUtils.isNotBlank(search)){
-            map.put("search",search);
+    public PagedGridResult getIndexVlogList(String search, String userId, Integer page, Integer pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        if (StringUtils.isNotBlank(search)) {
+            map.put("search", search);
         }
-        PageHelper.startPage(page,pageSize);
+        PageHelper.startPage(page, pageSize);
         Page<IndexVlogVO> listPage = vlogMapper.queryBatch(map);
         List<IndexVlogVO> result = listPage.getResult();
-        return setterPagedGrid(result,page);
+
+        for (IndexVlogVO v : result) {
+            String vlogId = v.getVlogId();
+
+            //判断用户是否点赞过视频
+            if (StringUtils.isNotBlank(userId)) {
+                v.setDoILikeThisVlog(doILikeVlog(userId, vlogId));
+            }
+
+            //获取当前视频被点赞过得总数
+            v.setLikeCounts(getVlogBeLikedCounts(vlogId));
+
+        }
+
+        return setterPagedGrid(result, page);
+    }
+
+    @Override
+    public Integer getVlogBeLikedCounts(String vlogId) {
+        String countsStr = redisOperator.get(REDIS_VLOG_BE_LIKED_COUNTS + ":" + vlogId);
+        if (StringUtils.isBlank(countsStr)) {
+            countsStr = "0";
+        }
+        return Integer.valueOf(countsStr);
+    }
+
+    private boolean doILikeVlog(String myId, String vlogId) {
+
+        String doILike = redisOperator.get(REDIS_USER_LIKE_VLOG + ":" + myId + ":" + vlogId);
+        boolean isLike = false;
+        if (StringUtils.isNotBlank(doILike) && doILike.equals("1")) {
+            isLike = true;
+        }
+        return isLike;
     }
 
     /**
      * 新增视频
+     *
      * @param vlogDTO
      */
     @Transactional
     @Override
-    public void createVlog(VlogDTO vlogDTO){
+    public void createVlog(VlogDTO vlogDTO) {
         String vid = sid.nextShort();
         Vlog vlog = new Vlog();
-        BeanUtils.copyProperties(vlogDTO,vlog);
+        BeanUtils.copyProperties(vlogDTO, vlog);
         vlog.setId(vid);
         vlog.setLikeCounts(0);
         vlog.setCommentsCounts(0);
@@ -102,11 +294,7 @@ public class VlogServiceImpl extends BaseInfoProperties implements VlogService {
 //        vlog.setUpdatedTime(new Date());
 
         vlogMapper.add(vlog);
-//        vlogMapper.insert(vlog);
+        //vlogMapper.insert(vlog);
     }
 
-    @Override
-    public String toString() {
-        return null;
-    }
 }

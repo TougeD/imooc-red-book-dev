@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class CommentBDTO {
+public class CommentDTO {
 
     @NotBlank(message = "留言信息不完整")
     private String vlogerId;

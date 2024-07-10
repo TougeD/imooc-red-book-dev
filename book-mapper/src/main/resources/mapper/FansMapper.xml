@@ -10,4 +10,35 @@
     <result column="fan_id" property="fanId" jdbcType="VARCHAR" />
     <result column="is_fan_friend_of_mine" property="isFanFriendOfMine" jdbcType="INTEGER" />
   </resultMap>
+    <update id="updateById">
+        update fans
+        <set>
+            <if test="vlogerId!=null">vloger_id=#{vlogerId},</if>
+            <if test="fanId!=null">fan_id=#{fanId},</if>
+            <if test="isFanFriendOfMine!=null">is_fan_friend_of_mine=#{isFanFriendOfMine},</if>
+        </set>
+        where id = #{id}
+    </update>
+    <select id="queryFansByFans" resultType="com.imooc.pojo.Fans">
+        select * from fans
+        <where>
+            <if test="id!=null">and id=#{id}</if>
+            <if test="vlogerId!=null">and vloger_id=#{vlogerId}</if>
+            <if test="fanId!=null">and fan_id=#{fanId}</if>
+            <if test="isFanFriendOfMine!=null">and is_fan_friend_of_mine=#{isFanFriendOfMine}</if>
+        </where>
+    </select>
+    <select id="queryMyFollows" resultType="com.imooc.vo.VlogerVO">
+        select u.id vlogerId, u.nickname , u.face
+        from fans f left join users u ON f.vloger_id = u.id
+        where f.fan_id = #{myId}
+        ORDER By u.nickname ASC
+    </select>
+
+    <select id="queryMyFans" resultType="com.imooc.vo.FansVO">
+        select u.id fanId, u.nickname , u.face
+        from fans f left join users u ON f.fan_id = u.id
+        where f.vloger_id = #{myId}
+        ORDER By u.nickname ASC
+    </select>
 </mapper>

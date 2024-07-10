@@ -9,4 +9,8 @@
     <result column="user_id" property="userId" jdbcType="VARCHAR" />
     <result column="vlog_id" property="vlogId" jdbcType="VARCHAR" />
   </resultMap>
+
+    <insert id="add">
+        insert into my_liked_vlog (id, user_id, vlog_id) VALUES (#{id},#{userId},#{vlogId})
+    </insert>
 </mapper>

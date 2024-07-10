@@ -14,4 +14,27 @@
     <result column="like_counts" property="likeCounts" jdbcType="INTEGER" />
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
   </resultMap>
+    <select id="getCommentList" resultType="com.imooc.vo.CommentVO">
+        select c.id                commentId,
+               c.vloger_id         vlogId,
+               u.id                vlogerId,
+               u.nickname          commentUserNickname,
+               u.face              commentUserFace,
+               c.father_comment_id fatherCommentId,
+               c.comment_user_id,
+               c.content,
+               c.like_counts,
+               fu.nickname as      replyedUserNickname,
+               c.create_time
+        from comment c
+                 left join users u
+                           on c.comment_user_id = u.id
+                 left join comment as fc
+                           on c.father_comment_id = fc.id
+                 left join users fu
+                           on fc.comment_user_id = fu.id
+        where c.vlog_id = #{vlogId}
+        ORDER BY c.like_counts DESC,
+                 c.create_time DESC
+    </select>
 </mapper>
