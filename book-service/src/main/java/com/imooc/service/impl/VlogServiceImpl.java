@@ -4,12 +4,14 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.imooc.base.BaseInfoProperties;
 import com.imooc.dto.VlogDTO;
+import com.imooc.enums.MessageEnum;
 import com.imooc.enums.YesOrNo;
 import com.imooc.mapper.MyLikedVlogMapper;
 import com.imooc.mapper.VlogMapper;
 import com.imooc.pojo.MyLikedVlog;
 import com.imooc.pojo.Vlog;
 import com.imooc.service.FansService;
+import com.imooc.service.MsgService;
 import com.imooc.service.VlogService;
 import com.imooc.utils.PagedGridResult;
 import com.imooc.vo.IndexVlogVO;
@@ -43,6 +45,9 @@ public class VlogServiceImpl extends BaseInfoProperties implements VlogService {
 
     @Autowired
     private FansService fansService;
+
+    @Autowired
+    private MsgService msgService;
 
     @Autowired
     private Sid sid;
@@ -183,14 +188,25 @@ public class VlogServiceImpl extends BaseInfoProperties implements VlogService {
     public void userLikeVlog(String userId, String vlogId) {
         String rid = sid.nextShort();
 
-        MyLikedVlog myLikedVlog = MyLikedVlog.builder()
-                .userId(userId)
-                .id(rid)
-                .vlogId(vlogId)
-                .build();
+        MyLikedVlog likedVlog = new MyLikedVlog();
+        likedVlog.setId(rid);
+        likedVlog.setVlogId(vlogId);
+        likedVlog.setUserId(userId);
 
-        myLikedVlogMapper.add(myLikedVlog);
+        myLikedVlogMapper.insert(likedVlog);
+
+
+        // 系统消息：点赞短视频
+        Vlog vlog = vlogMapper.selectByPrimaryKey(vlogId);
+        Map msgContent = new HashMap();
+        msgContent.put("vlogId", vlogId);
+        msgContent.put("vlogCover", vlog.getCover());
+        msgService.createMsg(userId,
+                vlog.getVlogerId(),
+                MessageEnum.LIKE_VLOG.type,
+                msgContent);
     }
+
 
     /**
      * 改变用户视频可见状态
@@ -241,10 +257,14 @@ public class VlogServiceImpl extends BaseInfoProperties implements VlogService {
         List<IndexVlogVO> result = listPage.getResult();
 
         for (IndexVlogVO v : result) {
+            String vlogerId = v.getVlogerId();
             String vlogId = v.getVlogId();
 
             //判断用户是否点赞过视频
             if (StringUtils.isNotBlank(userId)) {
+                // 用户是否关注该博主
+                boolean doIFollowVloger = fansService.queryDoIFollowVloger(userId, vlogerId);
+                v.setDoIFollowVloger(doIFollowVloger);
                 v.setDoILikeThisVlog(doILikeVlog(userId, vlogId));
             }
 

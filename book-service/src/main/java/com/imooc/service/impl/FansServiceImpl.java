@@ -3,10 +3,12 @@ package com.imooc.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.imooc.base.BaseInfoProperties;
+import com.imooc.enums.MessageEnum;
 import com.imooc.enums.YesOrNo;
 import com.imooc.mapper.FansMapper;
 import com.imooc.pojo.Fans;
 import com.imooc.service.FansService;
+import com.imooc.service.MsgService;
 import com.imooc.utils.PagedGridResult;
 import com.imooc.vo.FansVO;
 import com.imooc.vo.VlogerVO;
@@ -32,6 +34,9 @@ public class FansServiceImpl extends BaseInfoProperties implements FansService {
 
     @Autowired
     private FansMapper fansMapper;
+
+    @Autowired
+    private MsgService msgService;
 
     @Autowired
     private Sid sid;
@@ -155,6 +160,9 @@ public class FansServiceImpl extends BaseInfoProperties implements FansService {
         }
         //将新的关系添加进表中
         fansMapper.add(fans);
+
+        //系统消息：关注
+        msgService.createMsg(myId,vlogerId, MessageEnum.FOLLOW_YOU.type,null);
     }
 
     public Fans queryFansRelationShip(String fanId, String vlogerId) {

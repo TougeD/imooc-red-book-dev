@@ -1,6 +1,7 @@
 package com.imooc.service;
 
 import com.imooc.dto.CommentDTO;
+import com.imooc.pojo.Comment;
 import com.imooc.utils.PagedGridResult;
 import com.imooc.vo.CommentVO;
 
@@ -12,6 +13,13 @@ import com.imooc.vo.CommentVO;
  */
 public interface CommentService {
 
+
+    /**
+     * 根据主键查询comment
+     * @param id
+     * @return
+     */
+    public Comment getComment(String id);
 
     /**
      * 删除评论

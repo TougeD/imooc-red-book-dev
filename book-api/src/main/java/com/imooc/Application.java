@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import springfox.documentation.service.Contact;
@@ -20,6 +21,7 @@ import tk.mybatis.spring.annotation.MapperScan;
 @EnableTransactionManagement
 @MapperScan(basePackages = "com.imooc.mapper")
 @ComponentScan(basePackages = {"com.imooc","org.n3r.idworker"}) //扫描组件包
+@EnableMongoRepositories //开启MongoDB启动器
 public class Application {
 
     public static void main(String[] args) {

@@ -2,10 +2,14 @@ package com.imooc.controller;
 
 import com.imooc.base.BaseInfoProperties;
 import com.imooc.dto.CommentDTO;
+import com.imooc.enums.MessageEnum;
 import com.imooc.grace.result.GraceJSONResult;
 import com.imooc.mapper.CommentMapper;
+import com.imooc.mapper.VlogMapper;
 import com.imooc.pojo.Comment;
+import com.imooc.pojo.Vlog;
 import com.imooc.service.CommentService;
+import com.imooc.service.MsgService;
 import com.imooc.vo.CommentVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author 小小低头哥
@@ -34,6 +40,12 @@ public class CommentController extends BaseInfoProperties {
     private CommentService commentService;
 
     @Autowired
+    private MsgService msgService;
+
+    @Autowired
+    private VlogMapper vlogMapper;
+
+    @Autowired
     private CommentMapper commentMapper;
 
     @PostMapping("like")
@@ -43,6 +55,18 @@ public class CommentController extends BaseInfoProperties {
         redisOperator.incrementHash(REDIS_VLOG_COMMENT_LIKED_COUNTS,commentId,1);
         redisOperator.setHashValue(REDIS_USER_LIKE_COMMENT,userId + ":" + commentId,"1");
 
+        // 系统消息：点赞评论
+        Comment comment = commentService.getComment(commentId);
+        Vlog vlog = vlogMapper.selectByPrimaryKey(comment.getVlogId());
+
+        Map msgContent = new HashMap<>();
+        msgContent.put("commentId",commentId);
+        msgContent.put("vlogId",vlog.getId());
+        msgContent.put("vlogCover",vlog.getCover());
+
+        msgService.createMsg(userId,
+                comment.getCommentUserId(),
+                MessageEnum.LIKE_COMMENT.type, msgContent);
         return GraceJSONResult.ok();
     }
 
@@ -51,6 +75,7 @@ public class CommentController extends BaseInfoProperties {
                                  @RequestParam String userId){
         redisOperator.decrementHash(REDIS_VLOG_COMMENT_LIKED_COUNTS,commentId,1);
         redisOperator.hdel(REDIS_USER_LIKE_COMMENT,userId);
+
 
         return GraceJSONResult.ok();
     }

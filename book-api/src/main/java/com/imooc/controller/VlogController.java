@@ -5,11 +5,15 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.imooc.base.BaseInfoProperties;
 import com.imooc.dto.VlogDTO;
+import com.imooc.enums.MessageEnum;
 import com.imooc.enums.YesOrNo;
 import com.imooc.grace.result.GraceJSONResult;
+import com.imooc.mapper.MyLikedVlogMapper;
 import com.imooc.mapper.VlogMapper;
+import com.imooc.pojo.MyLikedVlog;
 import com.imooc.pojo.Users;
 import com.imooc.pojo.Vlog;
+import com.imooc.service.MsgService;
 import com.imooc.service.UserService;
 import com.imooc.service.VlogService;
 import com.imooc.utils.PagedGridResult;
@@ -19,6 +23,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
+import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,7 +51,16 @@ public class VlogController extends BaseInfoProperties {
     private UserService userService;
 
     @Autowired
+    private MyLikedVlogMapper myLikedVlogMapper;
+
+    @Autowired
+    private Sid sid;
+
+    @Autowired
     private RedisOperator redisOperator;
+
+    @Autowired
+    private MsgService msgService;
 
     @Autowired
     private VlogMapper vlogMapper;
@@ -118,6 +132,25 @@ public class VlogController extends BaseInfoProperties {
 
         //我点赞的视频 关联关系保存到数据库
         vlogService.userLikeVlog(userId, vlogId);
+
+        String rid = sid.nextShort();
+
+        MyLikedVlog myLikedVlog = MyLikedVlog.builder()
+                .userId(userId)
+                .id(rid)
+                .vlogId(vlogId)
+                .build();
+
+        myLikedVlogMapper.add(myLikedVlog);
+
+        //系统消息：点赞短视频
+
+        Vlog vlog = vlogMapper.selectByPrimaryKey(vlogId);
+        Map msgContent = new HashMap();
+        msgContent.put("vlogId",vlogId);
+        msgContent.put("vlogCover",vlog.getCover());
+        msgService.createMsg(userId,vlog.getVlogerId(), MessageEnum.LIKE_VLOG.type, msgContent);
+
 
         //点赞后 视频和视频发布者的获赞都会 + 1
         redisOperator.increment(REDIS_VLOG_BE_LIKED_COUNTS + ":" + vlogId, 1);
