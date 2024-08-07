@@ -14,34 +14,43 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 public interface VlogService {
 
     /**
+     * 把Counts输入数据库
+     */
+    public void flushCounts(String volgId, Integer counts);
+
+    /**
      * 查询朋友发布的短视频列表
+     *
      * @param userId
      * @param page
      * @param pageSize
      * @return
      */
-    public PagedGridResult gerMyFriendVlogList(String userId,Integer page,Integer pageSize);
+    public PagedGridResult gerMyFriendVlogList(String userId, Integer page, Integer pageSize);
 
     /**
      * 查询用户关注的博主发布的短视频列表
+     *
      * @param userId
      * @param page
      * @param pageSize
      * @return
      */
-    public PagedGridResult gerMyFollowVlogList(String userId,Integer page,Integer pageSize);
+    public PagedGridResult gerMyFollowVlogList(String userId, Integer page, Integer pageSize);
 
     /**
      * 查询用户点赞过的短视频
+     *
      * @param userId
      * @param page
      * @param pageSize
      * @return
      */
-    public PagedGridResult gerMyLikedVlogList(String userId,Integer page,Integer pageSize);
+    public PagedGridResult gerMyLikedVlogList(String userId, Integer page, Integer pageSize);
 
     /**
      * 获得用户点赞视频的总数
+     *
      * @param vlogId
      * @return
      */
@@ -49,10 +58,11 @@ public interface VlogService {
 
     /**
      * 用户点赞/喜欢的视频
+     *
      * @param userId
      * @param vlogId
      */
-    public void userLikeVlog(String userId,String vlogId);
+    public void userLikeVlog(String userId, String vlogId);
 
 //    /**
 //     * 查询用户的公开/私密的视频列表
@@ -77,7 +87,7 @@ public interface VlogService {
     /**
      * @param vlogId
      */
-    IndexVlogVO queryVlogDetailById(String userId,String vlogId);
+    IndexVlogVO queryVlogDetailById(String userId, String vlogId);
 
     /**
      * 新增视频
@@ -92,10 +102,11 @@ public interface VlogService {
      * @param search
      * @return
      */
-    PagedGridResult getIndexVlogList(String search,String userId, Integer page, Integer pageSize);
+    PagedGridResult getIndexVlogList(String search, String userId, Integer page, Integer pageSize);
 
     /**
      * 取消点赞视频
+     *
      * @param userId
      * @param vlogId
      */

@@ -94,6 +94,7 @@ public class PassportController extends BaseInfoProperties {
         BeanUtils.copyProperties(user, usersVO);
         usersVO.setUserToken(uToken);
 
+
         return GraceJSONResult.ok(usersVO);
 
         /**
@@ -140,7 +141,7 @@ public class PassportController extends BaseInfoProperties {
         //将验证码放入到redis中 用于后续验证
         redisOperator.set(MOBILE_SMSCODE + ":" + mobile, code, 5 * 60);
 
-        //把验证码放入到redis中 用于后续的验证
+        //把验证码放入到redis中 用于后续的证
         return GraceJSONResult.ok();
     }
 

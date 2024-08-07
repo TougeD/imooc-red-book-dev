@@ -3,20 +3,24 @@ package com.imooc.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.imooc.base.BaseInfoProperties;
+import com.imooc.base.RabbitMQConfig;
 import com.imooc.dto.CommentDTO;
 import com.imooc.enums.MessageEnum;
 import com.imooc.enums.YesOrNo;
 import com.imooc.mapper.CommentMapper;
 import com.imooc.mapper.VlogMapper;
+import com.imooc.mo.MessageMO;
 import com.imooc.pojo.Comment;
 import com.imooc.pojo.Vlog;
 import com.imooc.service.CommentService;
 import com.imooc.service.MsgService;
+import com.imooc.utils.JsonUtils;
 import com.imooc.utils.PagedGridResult;
 import com.imooc.vo.CommentVO;
 import org.apache.commons.lang3.StringUtils;
 import org.checkerframework.checker.units.qual.A;
 import org.n3r.idworker.Sid;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,6 +51,9 @@ public class CommentServiceImpl extends BaseInfoProperties implements CommentSer
 
     @Autowired
     private Sid sid;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     /**
      * 根据主键查询评论
@@ -162,9 +169,19 @@ public class CommentServiceImpl extends BaseInfoProperties implements CommentSer
         msgContent.put("vlogId",vlog.getId());
         msgContent.put("vlogCover",vlog.getCover());
 
-        msgService.createMsg(commentDTO.getCommentUserId(),
-                commentDTO.getVlogerId(),
-                type, msgContent);
+        MessageMO messageMO = new MessageMO();
+        messageMO.setFromUserId(commentDTO.getCommentUserId());
+        messageMO.setToUserId(commentDTO.getVlogerId());
+        if(commentDTO.getFatherCommentId() != null){
+            messageMO.setToUserId(commentDTO.getFatherCommentId());
+        }
+        messageMO.setMsgContent(msgContent);
+        //优化使用MQ异步解耦
+
+        rabbitTemplate.convertAndSend(RabbitMQConfig.EXCHANGE_MSG,"sys.msg."+MessageEnum.COMMENT_VLOG.enValue, JsonUtils.objectToJson(messageMO));
+//        msgService.createMsg(commentDTO.getCommentUserId(),
+//                commentDTO.getVlogerId(),
+//                type, msgContent);
 
         return commentVO;
     }

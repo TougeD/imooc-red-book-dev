@@ -36,6 +36,7 @@ public class PassportInterceptor extends BaseInfoProperties implements HandlerIn
             //return false;
             throw new SMSSendErrorException(ResponseStatusEnum.SMS_NEED_WAIT_ERROR);
         }
+        log.info("通过短信拦截");
         return true;
     }
 
